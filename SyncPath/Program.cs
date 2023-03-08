@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace SyncPath // Note: actual namespace depends on the project name.
 {
@@ -6,12 +7,45 @@ namespace SyncPath // Note: actual namespace depends on the project name.
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-
-            SyncDirectories("D:\\git\\SyncPath\\SyncPath\\bin\\Debug\\net7.0\\test\\A",
-                "D:\\git\\SyncPath\\SyncPath\\bin\\Debug\\net7.0\\test\\B");
+            MainAsync(args).GetAwaiter().GetResult();
+        }
 
 
+        public static async Task MainAsync(string[] args) 
+        {
+
+            if (args.Length == 2)
+            {
+                var sourcePath = args[0];
+                var targetPath = args[1];
+
+                Console.WriteLine("开始同步...");
+                Console.WriteLine($"源{sourcePath} ->");
+                Console.WriteLine($"目标{targetPath}");
+
+                await SyncTimer(sourcePath, targetPath);
+            }
+            else
+            {
+                Console.WriteLine("参数错误");
+            }
+            
+        }
+
+        public static async Task SyncTimer(string sourcePath, string targetPath)
+        {
+            while (true)
+            {
+
+                await Task.Run(() =>
+                {
+                    Console.WriteLine("开始一次同步");
+                    SyncDirectories(sourcePath, targetPath);
+                });
+                Console.WriteLine("等待3小时...");
+                await Task.Delay(1000 * 60 * 60 * 3); //每3小时一次
+
+            }
         }
 
 
@@ -35,10 +69,21 @@ namespace SyncPath // Note: actual namespace depends on the project name.
 
                 if (!targetFile.Exists || sourceFile.LastWriteTime > targetFile.LastWriteTime || sourceFile.Length != targetFile.Length)
                 {
-                    Console.WriteLine("Syncing file: " + sourceFile.Name);
+                    Console.WriteLine("同步文件: " + sourceFile.Name);
 
                     // Copy the file from source to target
-                    sourceFile.CopyTo(targetFilePath, true);
+
+                    try
+                    {
+                        sourceFile.CopyTo(targetFilePath, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("同步文件错误: " + targetFile.Name);
+
+                    }
+
+                    
                 }
             }
 
@@ -49,10 +94,18 @@ namespace SyncPath // Note: actual namespace depends on the project name.
 
                 if (!File.Exists(sourceFilePath))
                 {
-                    Console.WriteLine("Deleting file: " + targetFile.Name);
+                    Console.WriteLine("删除文件: " + targetFile.Name);
 
                     // Delete the file from target
-                    targetFile.Delete();
+                    try
+                    {
+                        targetFile.Delete();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("删除文件错误: " + targetFile.Name);
+                    }
+                    
                 }
             }
 
