@@ -83,7 +83,7 @@ namespace SyncPath // Note: actual namespace depends on the project name.
 
                     }
 
-                    
+
                 }
             }
 
@@ -105,7 +105,7 @@ namespace SyncPath // Note: actual namespace depends on the project name.
                     {
                         Console.WriteLine("删除文件错误: " + targetFile.Name);
                     }
-                    
+
                 }
             }
 
@@ -116,7 +116,30 @@ namespace SyncPath // Note: actual namespace depends on the project name.
 
                 SyncDirectories(sourceSubDirectory.FullName, targetSubDirectoryPath);
             }
+
+            // Delete subdirectories from target directory that don't exist in source directory
+            foreach (DirectoryInfo targetSubDirectory in targetDirectory.GetDirectories())
+            {
+                string sourceSubDirectoryPath = Path.Combine(sourcePath, targetSubDirectory.Name);
+
+                if (!Directory.Exists(sourceSubDirectoryPath))
+                {
+                    Console.WriteLine("删除目录: " + targetSubDirectory.Name);
+
+                    // Delete the directory from target
+                    try
+                    {
+                        targetSubDirectory.Delete(true);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("删除目录错误: " + targetSubDirectory.Name);
+                    }
+
+                }
+            }
         }
+
 
     }
 }
