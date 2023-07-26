@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace SyncPath // Note: actual namespace depends on the project name.
 {
