@@ -31,6 +31,7 @@ namespace SyncPath // Note: actual namespace depends on the project name.
             {
                 Console.WriteLine("参数错误");
             }
+            Console.ReadLine();
             
         }
 
