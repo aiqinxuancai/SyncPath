@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace SyncPath // Note: actual namespace depends on the project name.
@@ -37,6 +38,18 @@ namespace SyncPath // Note: actual namespace depends on the project name.
 
         public static async Task SyncTimer(string sourcePath, string targetPath)
         {
+            string server = new Uri(sourcePath).Host;
+
+            // 创建并添加凭据
+            NetworkCredential credentials = new NetworkCredential("1234", "5678");
+            CredentialCache cache = new CredentialCache();
+            cache.Add(new Uri($"\\\\{server}"), "Basic", credentials);
+
+            // 将凭据添加到默认网络凭据
+            // 这样 System.IO 就可以使用这些凭据来访问 UNC 路径
+            System.Net.WebRequest.DefaultWebProxy.Credentials = cache;
+
+
             while (true)
             {
 
